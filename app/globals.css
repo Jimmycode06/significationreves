@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-500;
+  }
+
+  /* Hero background gradient */
+  .hero-gradient {
+    background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at bottom left, rgba(139, 92, 246, 0.15) 0%, transparent 40%);
+  }
+
+  /* Prose for dream content (replacing typography plugin) */
+  .dream-content h2 {
+    @apply text-xl sm:text-2xl font-bold text-zinc-900 mt-10 mb-4 pb-2 border-b border-zinc-200;
+  }
+  .dream-content p {
+    @apply text-base text-zinc-600 mb-5 leading-relaxed;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Hide scrollbar */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .delay-100 { animation-delay: 100ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-400 { animation-delay: 400ms; }
+}
+
+/* Styles pour le contenu des rêves (Raw HTML) */
+.dream-content {
+  @apply text-zinc-700 leading-relaxed text-base sm:text-lg;
+}
+
+.dream-content h2 {
+  @apply text-2xl sm:text-3xl font-bold text-zinc-900 mt-10 mb-6;
+}
+
+.dream-content p {
+  @apply mb-6;
+}
+
+.dream-content strong {
+  @apply font-bold text-zinc-900;
+}
+
+.dream-content ul {
+  @apply list-disc list-inside mb-6 space-y-2;
+}
+
+.dream-content li {
+  @apply ml-4;
+}
+
+.dream-content blockquote {
+  @apply border-l-4 border-indigo-200 bg-indigo-50/50 p-4 italic text-zinc-600 rounded-r-lg my-6;
+}
