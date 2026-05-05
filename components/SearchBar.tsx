@@ -10,18 +10,32 @@ interface SearchBarProps {
   dreams: Dream[];
 }
 
+function normalizeForSearch(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function stripHtml(value: string): string {
+  return value.replace(/<[^>]*>/g, " ");
+}
+
 export default function SearchBar({ dreams }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
 
   const results = useMemo(() => {
     if (query.length < 2) return [];
-    const q = query.toLowerCase();
-    return dreams.filter(
-      (d) =>
-        d.title.toLowerCase().includes(q) ||
-        d.shortDescription.toLowerCase().includes(q)
-    );
+    const q = normalizeForSearch(query.trim());
+
+    return dreams.filter((d) => {
+      const title = normalizeForSearch(d.title);
+      const description = normalizeForSearch(d.shortDescription);
+      const content = normalizeForSearch(stripHtml(d.content));
+
+      return title.includes(q) || description.includes(q) || content.includes(q);
+    });
   }, [query, dreams]);
 
   const showResults = isFocused && query.length >= 2;
