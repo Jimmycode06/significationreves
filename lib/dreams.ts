@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 // Eviter la duplication d'instances PrismaClient au rechargement (Next.js dev)
 const globalForPrisma = globalThis as unknown as {
@@ -23,26 +23,45 @@ export interface Dream {
   dateModified?: Date | string | null;
 }
 
-export async function getAllDreams(): Promise<Dream[]> {
+/** Card / list row: no article body to limit Supabase egress */
+export type DreamSummary = Omit<Dream, "content">;
+
+const dreamListSelect = {
+  id: true,
+  slug: true,
+  title: true,
+  emoji: true,
+  letter: true,
+  shortDescription: true,
+  popularityRank: true,
+  relatedSlugs: true,
+  datePublished: true,
+  dateModified: true,
+} satisfies Prisma.DreamSelect;
+
+export async function getAllDreams(): Promise<DreamSummary[]> {
   return prisma.dream.findMany({
-    orderBy: { title: 'asc' },
+    orderBy: { title: "asc" },
+    select: dreamListSelect,
   });
 }
 
-export async function getPopularDreams(limit: number = 4): Promise<Dream[]> {
+export async function getPopularDreams(limit: number = 4): Promise<DreamSummary[]> {
   return prisma.dream.findMany({
     take: limit,
-    orderBy: { popularityRank: 'desc' },
+    orderBy: { popularityRank: "desc" },
+    select: dreamListSelect,
   });
 }
 
-export async function getDreamsGroupedByLetter(): Promise<Record<string, Dream[]>> {
+export async function getDreamsGroupedByLetter(): Promise<Record<string, DreamSummary[]>> {
   const dreams = await prisma.dream.findMany({
-    orderBy: { title: 'asc' },
+    orderBy: { title: "asc" },
+    select: dreamListSelect,
   });
   
-  const grouped: Record<string, Dream[]> = {};
-  dreams.forEach((dream: Dream) => {
+  const grouped: Record<string, DreamSummary[]> = {};
+  dreams.forEach((dream: DreamSummary) => {
     if (!grouped[dream.letter]) {
       grouped[dream.letter] = [];
     }
@@ -52,15 +71,15 @@ export async function getDreamsGroupedByLetter(): Promise<Record<string, Dream[]
   return Object.keys(grouped).sort().reduce((acc, key) => {
     acc[key] = grouped[key].sort((a, b) => a.title.localeCompare(b.title, "fr"));
     return acc;
-  }, {} as Record<string, Dream[]>);
+  }, {} as Record<string, DreamSummary[]>);
 }
 
 export async function getAvailableLetters(): Promise<string[]> {
   const letters = await prisma.dream.findMany({
     select: { letter: true },
-    distinct: ['letter'],
+    distinct: ["letter"],
   });
-  return letters.map((d: any) => d.letter).sort();
+  return letters.map((d) => d.letter).sort();
 }
 
 export async function getDreamBySlug(slug: string): Promise<Dream | null> {

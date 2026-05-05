@@ -4,11 +4,11 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Search, X, ArrowRight } from "lucide-react";
-import type { Dream } from "@/lib/dreams";
+import type { DreamSummary } from "@/lib/dreams";
 import { searchDreamsByTitle } from "@/lib/search";
 
 interface SearchBarProps {
-  dreams: Dream[];
+  dreams: DreamSummary[];
 }
 
 export default function SearchBar({ dreams }: SearchBarProps) {

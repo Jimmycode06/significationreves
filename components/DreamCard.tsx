@@ -1,10 +1,10 @@
 // components/DreamCard.tsx
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import type { Dream } from "@/lib/dreams";
+import type { DreamSummary } from "@/lib/dreams";
 
 interface DreamCardProps {
-  dream: Dream;
+  dream: DreamSummary;
 }
 
 export default function DreamCard({ dream }: DreamCardProps) {

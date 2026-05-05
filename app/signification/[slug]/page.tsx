@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Share2, Sparkles, BookOpenText } from "lucide-react";
-import { getDreamBySlug, getAllDreams } from "@/lib/dreams";
+import { getDreamBySlug, getAllDreams, getAvailableLetters } from "@/lib/dreams";
 import AlphabetNav from "@/components/AlphabetNav";
 import JsonLd from "@/components/JsonLd";
 
@@ -53,9 +53,7 @@ export default async function DreamPage({ params }: DreamPageProps) {
     notFound();
   }
 
-  const allDreams = await getAllDreams();
-  // Filter out the current dream
-  const availableLetters = Array.from(new Set(allDreams.map((d: any) => d.letter))).sort() as string[];
+  const availableLetters = await getAvailableLetters();
 
   return (
     <>

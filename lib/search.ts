@@ -1,7 +1,7 @@
-import type { Dream } from "@/lib/dreams";
+import type { DreamSummary } from "@/lib/dreams";
 
 interface SearchableDream {
-  dream: Dream;
+  dream: DreamSummary;
   title: string;
 }
 
@@ -12,7 +12,7 @@ export function normalizeForSearch(value: string): string {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
-export function buildTitleSearchIndex(dreams: Dream[]): SearchableDream[] {
+export function buildTitleSearchIndex(dreams: DreamSummary[]): SearchableDream[] {
   return dreams.map((dream) => ({
     dream,
     title: normalizeForSearch(dream.title),
@@ -20,9 +20,9 @@ export function buildTitleSearchIndex(dreams: Dream[]): SearchableDream[] {
 }
 
 export function searchDreamsByTitle(
-  dreams: Dream[],
+  dreams: DreamSummary[],
   query: string
-): Dream[] {
+): DreamSummary[] {
   const normalizedQuery = normalizeForSearch(query.trim());
   if (normalizedQuery.length < 2) return [];
 
