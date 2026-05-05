@@ -13,9 +13,6 @@ interface SearchBarProps {
 interface SearchableDream {
   dream: Dream;
   title: string;
-  description: string;
-  content: string;
-  searchableText: string;
 }
 
 function normalizeForSearch(value: string): string {
@@ -23,10 +20,6 @@ function normalizeForSearch(value: string): string {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
-}
-
-function stripHtml(value: string): string {
-  return value.replace(/<[^>]*>/g, " ");
 }
 
 export default function SearchBar({ dreams }: SearchBarProps) {
@@ -37,15 +30,10 @@ export default function SearchBar({ dreams }: SearchBarProps) {
     () =>
       dreams.map((dream) => {
         const title = normalizeForSearch(dream.title);
-        const description = normalizeForSearch(dream.shortDescription);
-        const content = normalizeForSearch(stripHtml(dream.content));
 
         return {
           dream,
           title,
-          description,
-          content,
-          searchableText: `${title} ${description} ${content}`,
         };
       }),
     [dreams]
@@ -58,13 +46,11 @@ export default function SearchBar({ dreams }: SearchBarProps) {
     const terms = normalizedQuery.split(/\s+/).filter(Boolean);
 
     return searchableDreams
-      .filter(({ searchableText }) =>
-        terms.every((term) => searchableText.includes(term))
-      )
+      .filter(({ title }) => terms.every((term) => title.includes(term)))
       .sort((a, b) => {
         const score = (item: SearchableDream) => {
-          if (terms.every((term) => item.title.includes(term))) return 3;
-          if (terms.every((term) => item.description.includes(term))) return 2;
+          if (item.title === normalizedQuery) return 3;
+          if (item.title.startsWith(normalizedQuery)) return 2;
           return 1;
         };
 
