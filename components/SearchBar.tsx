@@ -10,6 +10,14 @@ interface SearchBarProps {
   dreams: Dream[];
 }
 
+interface SearchableDream {
+  dream: Dream;
+  title: string;
+  description: string;
+  content: string;
+  searchableText: string;
+}
+
 function normalizeForSearch(value: string): string {
   return value
     .toLowerCase()
@@ -25,18 +33,45 @@ export default function SearchBar({ dreams }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
 
+  const searchableDreams = useMemo<SearchableDream[]>(
+    () =>
+      dreams.map((dream) => {
+        const title = normalizeForSearch(dream.title);
+        const description = normalizeForSearch(dream.shortDescription);
+        const content = normalizeForSearch(stripHtml(dream.content));
+
+        return {
+          dream,
+          title,
+          description,
+          content,
+          searchableText: `${title} ${description} ${content}`,
+        };
+      }),
+    [dreams]
+  );
+
   const results = useMemo(() => {
-    if (query.length < 2) return [];
-    const q = normalizeForSearch(query.trim());
+    const normalizedQuery = normalizeForSearch(query.trim());
+    if (normalizedQuery.length < 2) return [];
 
-    return dreams.filter((d) => {
-      const title = normalizeForSearch(d.title);
-      const description = normalizeForSearch(d.shortDescription);
-      const content = normalizeForSearch(stripHtml(d.content));
+    const terms = normalizedQuery.split(/\s+/).filter(Boolean);
 
-      return title.includes(q) || description.includes(q) || content.includes(q);
-    });
-  }, [query, dreams]);
+    return searchableDreams
+      .filter(({ searchableText }) =>
+        terms.every((term) => searchableText.includes(term))
+      )
+      .sort((a, b) => {
+        const score = (item: SearchableDream) => {
+          if (terms.every((term) => item.title.includes(term))) return 3;
+          if (terms.every((term) => item.description.includes(term))) return 2;
+          return 1;
+        };
+
+        return score(b) - score(a);
+      })
+      .map(({ dream }) => dream);
+  }, [query, searchableDreams]);
 
   const showResults = isFocused && query.length >= 2;
 
@@ -82,26 +117,32 @@ export default function SearchBar({ dreams }: SearchBarProps) {
       {showResults && (
         <div className="absolute z-50 left-0 right-0 mt-2 rounded-2xl border border-zinc-100 bg-white shadow-xl shadow-indigo-900/5 overflow-hidden">
           {results.length > 0 ? (
-            <ul>
-              {results.map((dream) => (
-                <li key={dream.slug}>
-                  <Link
-                    href={`/signification/${dream.slug}`}
-                    className="flex items-center gap-4 px-5 py-3 hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-b-0"
-                  >
-                    <span className="text-2xl">{dream.emoji}</span>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-zinc-900 truncate">
-                        {dream.title.split(":")[0]}
-                      </p>
-                      <p className="text-sm text-zinc-500 truncate">
-                        {dream.shortDescription}
-                      </p>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <>
+              <div className="border-b border-slate-100 px-5 py-2 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                {results.length} signification{results.length > 1 ? "s" : ""} trouvée
+                {results.length > 1 ? "s" : ""}
+              </div>
+              <ul className="max-h-96 overflow-y-auto">
+                {results.map((dream) => (
+                  <li key={dream.slug}>
+                    <Link
+                      href={`/signification/${dream.slug}`}
+                      className="flex items-center gap-4 px-5 py-3 hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-b-0"
+                    >
+                      <span className="text-2xl">{dream.emoji}</span>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-zinc-900 truncate">
+                          {dream.title.split(":")[0]}
+                        </p>
+                        <p className="text-sm text-zinc-500 truncate">
+                          {dream.shortDescription}
+                        </p>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
           ) : (
              <div className="px-5 py-4 text-center text-sm text-zinc-500">
                Aucun rêve trouvé pour « <span className="font-medium text-zinc-900">{query}</span> »
