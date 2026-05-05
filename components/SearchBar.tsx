@@ -3,68 +3,31 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Search, X } from "lucide-react";
+import { Search, X, ArrowRight } from "lucide-react";
 import type { Dream } from "@/lib/dreams";
+import { searchDreamsByTitle } from "@/lib/search";
 
 interface SearchBarProps {
   dreams: Dream[];
-}
-
-interface SearchableDream {
-  dream: Dream;
-  title: string;
-}
-
-function normalizeForSearch(value: string): string {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
 }
 
 export default function SearchBar({ dreams }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
 
-  const searchableDreams = useMemo<SearchableDream[]>(
-    () =>
-      dreams.map((dream) => {
-        const title = normalizeForSearch(dream.title);
-
-        return {
-          dream,
-          title,
-        };
-      }),
-    [dreams]
-  );
-
   const results = useMemo(() => {
-    const normalizedQuery = normalizeForSearch(query.trim());
-    if (normalizedQuery.length < 2) return [];
-
-    const terms = normalizedQuery.split(/\s+/).filter(Boolean);
-
-    return searchableDreams
-      .filter(({ title }) => terms.every((term) => title.includes(term)))
-      .sort((a, b) => {
-        const score = (item: SearchableDream) => {
-          if (item.title === normalizedQuery) return 3;
-          if (item.title.startsWith(normalizedQuery)) return 2;
-          return 1;
-        };
-
-        return score(b) - score(a);
-      })
-      .map(({ dream }) => dream);
-  }, [query, searchableDreams]);
+    return searchDreamsByTitle(dreams, query);
+  }, [query, dreams]);
 
   const showResults = isFocused && query.length >= 2;
+  const searchUrl = `/recherche?q=${encodeURIComponent(query.trim())}`;
 
   return (
     <div className="relative w-full max-w-2xl mx-auto">
       {/* Barre d'input principale */}
-      <div
+      <form
+        action="/recherche"
+        method="GET"
         className={`flex items-center gap-3 rounded-2xl bg-white px-5 py-4 shadow-sm transition-all duration-300 ${
           isFocused ? "shadow-indigo-100 ring-2 ring-indigo-500" : "border border-zinc-200"
         }`}
@@ -76,6 +39,7 @@ export default function SearchBar({ dreams }: SearchBarProps) {
         />
         <input
           type="text"
+          name="q"
           placeholder="Rechercher un rêve... (ex: serpent, voler, dents)"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -90,6 +54,7 @@ export default function SearchBar({ dreams }: SearchBarProps) {
         />
         {query && (
           <button
+            type="button"
             onClick={() => setQuery("")}
             className="text-zinc-400 hover:text-zinc-600 transition-colors"
             aria-label="Effacer la recherche"
@@ -97,7 +62,15 @@ export default function SearchBar({ dreams }: SearchBarProps) {
             <X className="h-5 w-5" />
           </button>
         )}
-      </div>
+        <button
+          type="submit"
+          className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={query.trim().length < 2}
+        >
+          Rechercher
+          <ArrowRight className="h-4 w-4" />
+        </button>
+      </form>
 
       {/* Dropdown de résultats */}
       {showResults && (
@@ -128,6 +101,13 @@ export default function SearchBar({ dreams }: SearchBarProps) {
                   </li>
                 ))}
               </ul>
+              <Link
+                href={searchUrl}
+                className="flex items-center justify-center gap-2 border-t border-slate-100 px-5 py-3 text-sm font-semibold text-indigo-600 transition-colors hover:bg-indigo-50"
+              >
+                Voir tous les résultats
+                <ArrowRight className="h-4 w-4" />
+              </Link>
             </>
           ) : (
              <div className="px-5 py-4 text-center text-sm text-zinc-500">
