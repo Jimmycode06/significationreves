@@ -5,6 +5,7 @@ import { ArrowLeft, Calendar, Share2, Sparkles, BookOpenText } from "lucide-reac
 import { getDreamBySlug, getAllDreams, getAvailableLetters } from "@/lib/dreams";
 import AlphabetNav from "@/components/AlphabetNav";
 import JsonLd from "@/components/JsonLd";
+import { SITE_URL } from "@/lib/site";
 
 interface DreamPageProps {
   params: {
@@ -34,7 +35,7 @@ export async function generateMetadata({
     title: `${dream.title} — Signification & Interprétation`,
     description: dream.shortDescription,
     alternates: {
-      canonical: `https://signification-reve.fr/signification/${dream.slug}`,
+      canonical: `${SITE_URL}/signification/${dream.slug}`,
     },
     openGraph: {
       title: `${dream.title} — Signification & Interprétation détaillée`,
@@ -61,7 +62,7 @@ export default async function DreamPage({ params }: DreamPageProps) {
         type="Article"
         title={dream.title}
         description={dream.shortDescription}
-        url={`https://signification-reve.fr/signification/${dream.slug}`}
+        url={`${SITE_URL}/signification/${dream.slug}`}
         datePublished={dream.datePublished ? new Date(dream.datePublished).toISOString() : new Date().toISOString()}
         dateModified={dream.dateModified ? new Date(dream.dateModified).toISOString() : new Date().toISOString()}
       />

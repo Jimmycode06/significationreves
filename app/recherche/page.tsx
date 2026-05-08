@@ -4,8 +4,7 @@ import { ArrowLeft, Search } from "lucide-react";
 import DreamCard from "@/components/DreamCard";
 import { getAllDreams } from "@/lib/dreams";
 import { searchDreamsByTitle } from "@/lib/search";
-
-const SITE_URL = "https://signification-reve.fr";
+import { SITE_URL } from "@/lib/site";
 
 interface SearchPageProps {
   searchParams?: {

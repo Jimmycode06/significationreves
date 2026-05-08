@@ -5,8 +5,7 @@ import DreamCard from "@/components/DreamCard";
 import AlphabetNav from "@/components/AlphabetNav";
 import JsonLd from "@/components/JsonLd";
 import { getAllDreams, getPopularDreams, getAvailableLetters } from "@/lib/dreams";
-
-const SITE_URL = "https://signification-reve.fr";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Signification des Rêves — Dictionnaire et Interprétation Complète",

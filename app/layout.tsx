@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { Moon, BookOpen, BookOpenText } from "lucide-react";
 import Link from "next/link";
 import JsonLd from "@/components/JsonLd";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({
@@ -11,8 +12,6 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
 });
-
-const SITE_URL = "https://signification-reve.fr";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

@@ -4,8 +4,7 @@ import { BookOpenText, ArrowRight } from "lucide-react";
 import AlphabetNav from "@/components/AlphabetNav";
 import JsonLd from "@/components/JsonLd";
 import { getDreamsGroupedByLetter, getAvailableLetters } from "@/lib/dreams";
-
-const SITE_URL = "https://signification-reve.fr";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Abécédaire des Rêves — Dictionnaire de A à Z",
