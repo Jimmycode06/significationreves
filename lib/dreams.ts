@@ -1,4 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 
 // Eviter la duplication d'instances PrismaClient au rechargement (Next.js dev)
 const globalForPrisma = globalThis as unknown as {
@@ -39,7 +41,41 @@ const dreamListSelect = {
   dateModified: true,
 } satisfies Prisma.DreamSelect;
 
+let staticDreamsCache: Dream[] | null | undefined;
+
+function getStaticDreams(): Dream[] | null {
+  if (staticDreamsCache !== undefined) {
+    return staticDreamsCache;
+  }
+
+  const staticDataPath = join(process.cwd(), "lib/data/dreams.generated.json");
+
+  if (!existsSync(staticDataPath)) {
+    staticDreamsCache = null;
+    return staticDreamsCache;
+  }
+
+  const dreams = JSON.parse(readFileSync(staticDataPath, "utf8")) as Dream[];
+  staticDreamsCache = dreams.length > 0 ? dreams : null;
+  return staticDreamsCache;
+}
+
+function toDreamSummary(dream: Dream): DreamSummary {
+  const { content: _content, ...summary } = dream;
+  return summary;
+}
+
+function sortDreamsByTitle<T extends { title: string }>(dreams: T[]): T[] {
+  return [...dreams].sort((a, b) => a.title.localeCompare(b.title, "fr"));
+}
+
 export async function getAllDreams(): Promise<DreamSummary[]> {
+  const staticDreams = getStaticDreams();
+
+  if (staticDreams) {
+    return sortDreamsByTitle(staticDreams.map(toDreamSummary));
+  }
+
   return prisma.dream.findMany({
     orderBy: { title: "asc" },
     select: dreamListSelect,
@@ -47,6 +83,15 @@ export async function getAllDreams(): Promise<DreamSummary[]> {
 }
 
 export async function getPopularDreams(limit: number = 4): Promise<DreamSummary[]> {
+  const staticDreams = getStaticDreams();
+
+  if (staticDreams) {
+    return [...staticDreams]
+      .map(toDreamSummary)
+      .sort((a, b) => (b.popularityRank ?? 0) - (a.popularityRank ?? 0))
+      .slice(0, limit);
+  }
+
   return prisma.dream.findMany({
     take: limit,
     orderBy: { popularityRank: "desc" },
@@ -55,6 +100,26 @@ export async function getPopularDreams(limit: number = 4): Promise<DreamSummary[
 }
 
 export async function getDreamsGroupedByLetter(): Promise<Record<string, DreamSummary[]>> {
+  const staticDreams = getStaticDreams();
+
+  if (staticDreams) {
+    const grouped: Record<string, DreamSummary[]> = {};
+
+    staticDreams.map(toDreamSummary).forEach((dream) => {
+      if (!grouped[dream.letter]) {
+        grouped[dream.letter] = [];
+      }
+      grouped[dream.letter].push(dream);
+    });
+
+    return Object.keys(grouped)
+      .sort()
+      .reduce((acc, key) => {
+        acc[key] = sortDreamsByTitle(grouped[key]);
+        return acc;
+      }, {} as Record<string, DreamSummary[]>);
+  }
+
   const dreams = await prisma.dream.findMany({
     orderBy: { title: "asc" },
     select: dreamListSelect,
@@ -75,6 +140,12 @@ export async function getDreamsGroupedByLetter(): Promise<Record<string, DreamSu
 }
 
 export async function getAvailableLetters(): Promise<string[]> {
+  const staticDreams = getStaticDreams();
+
+  if (staticDreams) {
+    return Array.from(new Set(staticDreams.map((dream) => dream.letter))).sort();
+  }
+
   const letters = await prisma.dream.findMany({
     select: { letter: true },
     distinct: ["letter"],
@@ -83,6 +154,12 @@ export async function getAvailableLetters(): Promise<string[]> {
 }
 
 export async function getDreamBySlug(slug: string): Promise<Dream | null> {
+  const staticDreams = getStaticDreams();
+
+  if (staticDreams) {
+    return staticDreams.find((dream) => dream.slug === slug) ?? null;
+  }
+
   return prisma.dream.findUnique({
     where: { slug }
   }) as unknown as Promise<Dream | null>;
