@@ -56,20 +56,22 @@ export default function SearchBar({ dreams }: SearchBarProps) {
           <button
             type="button"
             onClick={() => setQuery("")}
-            className="text-zinc-400 hover:text-zinc-600 transition-colors"
+            className="text-zinc-400 hover:text-zinc-600 transition-colors shrink-0"
             aria-label="Effacer la recherche"
           >
             <X className="h-5 w-5" />
           </button>
         )}
-        <button
-          type="submit"
-          className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={query.trim().length < 2}
-        >
-          Rechercher
-          <ArrowRight className="h-4 w-4" />
-        </button>
+        {query.trim().length >= 2 && (
+          <button
+            type="submit"
+            aria-label="Rechercher"
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-2 sm:px-4 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
+          >
+            <span className="hidden sm:inline">Rechercher</span>
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        )}
       </form>
 
       {/* Dropdown de résultats */}
