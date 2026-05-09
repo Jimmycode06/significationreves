@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
-import { Inter } from "next/font/google";
-import { Moon, BookOpen, BookOpenText } from "lucide-react";
-import Link from "next/link";
+import { Inter, Playfair_Display } from "next/font/google";
+import NavHeader from "@/components/NavHeader";
 import JsonLd from "@/components/JsonLd";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({
-  variable: "--font-geist-sans",
+  variable: "--font-sans",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-display",
   subsets: ["latin"],
   display: "swap",
 });
@@ -58,7 +63,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`${inter.variable} antialiased`}>
+    <html lang="fr" className={`${inter.variable} ${playfair.variable} antialiased`}>
       <body className="min-h-screen flex flex-col font-sans text-zinc-900 bg-white">
         {/* JSON-LD global WebSite */}
         <JsonLd
@@ -68,36 +73,7 @@ export default function RootLayout({
           description="Dictionnaire complet de la signification des rêves. Interprétations psychologiques et symboliques."
         />
 
-        {/* Header */}
-        <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/80 backdrop-blur-lg">
-          <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
-            <Link
-              href="/"
-              className="flex items-center gap-2.5 font-bold text-lg text-zinc-900 hover:text-indigo-600 transition-colors"
-            >
-              <Moon className="h-6 w-6 text-indigo-600" />
-              <span>
-                Signification<span className="text-indigo-600">Rêve</span>
-              </span>
-            </Link>
-            <div className="flex items-center gap-4">
-              <Link
-                href="/"
-                className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-zinc-600 hover:text-indigo-600 transition-colors"
-              >
-                <BookOpen className="h-4 w-4" />
-                Dictionnaire
-              </Link>
-              <Link
-                href="/abecedaire"
-                className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-zinc-600 hover:text-indigo-600 transition-colors"
-              >
-                <BookOpenText className="h-4 w-4" />
-                Abécédaire
-              </Link>
-            </div>
-          </nav>
-        </header>
+        <NavHeader />
 
         {/* Main content */}
         <main className="flex-1">{children}</main>
@@ -107,7 +83,6 @@ export default function RootLayout({
           <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
             <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
               <div className="flex items-center gap-2 text-sm text-zinc-500">
-                <Moon className="h-4 w-4 text-indigo-500" />
                 <span>
                   © {new Date().getFullYear()} SignificationRêve — Tous droits
                   réservés

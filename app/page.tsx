@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Sparkles, Stars } from "lucide-react";
+import { Sparkles, Stars, BookOpen, Zap, RefreshCw } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import DreamCard from "@/components/DreamCard";
 import AlphabetNav from "@/components/AlphabetNav";
@@ -53,6 +53,35 @@ export default async function HomePage() {
 
           <div className="mt-10 animate-fade-in-up delay-300">
             <SearchBar dreams={allDreams} />
+            {/* Tendances */}
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+              <span className="text-xs text-zinc-500 font-medium">Tendances :</span>
+              {["Serpent", "Voler", "Dents", "Eau", "Maison", "Mort"].map((term) => (
+                <a
+                  key={term}
+                  href={`/recherche?q=${encodeURIComponent(term.toLowerCase())}`}
+                  className="rounded-full border border-indigo-200 bg-white/80 px-3 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-50 hover:border-indigo-400 transition-all"
+                >
+                  {term}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Trust signals */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-6 animate-fade-in-up delay-400">
+            <div className="flex items-center gap-2 text-sm text-zinc-500">
+              <BookOpen className="h-4 w-4 text-indigo-400" />
+              <span>Interprétations détaillées</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-zinc-500">
+              <Zap className="h-4 w-4 text-indigo-400" />
+              <span>Psychologique &amp; symbolique</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-zinc-500">
+              <RefreshCw className="h-4 w-4 text-indigo-400" />
+              <span>Mis à jour régulièrement</span>
+            </div>
           </div>
         </div>
       </section>
