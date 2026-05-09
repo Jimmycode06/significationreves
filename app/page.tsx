@@ -31,7 +31,7 @@ export default async function HomePage() {
       />
 
       {/* Hero Section */}
-      <section className="hero-gradient py-16 sm:py-24 px-4 overflow-hidden">
+      <section className="hero-gradient py-16 sm:py-24 px-4">
         <div className="mx-auto max-w-3xl text-center relative z-10">
           <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white/70 backdrop-blur-sm px-4 py-1.5 text-sm font-medium text-indigo-700 mb-6 animate-fade-in-up">
             <Stars className="h-4 w-4" />
