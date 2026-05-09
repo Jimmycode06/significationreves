@@ -3,7 +3,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Search, X, ArrowRight } from "lucide-react";
+import { Search, X, ArrowRight, BookOpen, Zap, RefreshCw } from "lucide-react";
 import type { DreamSummary } from "@/lib/dreams";
 import { searchDreamsByTitle } from "@/lib/search";
 
@@ -73,6 +73,38 @@ export default function SearchBar({ dreams }: SearchBarProps) {
           </button>
         )}
       </form>
+
+      {/* Tendances + Trust signals — masqués quand le dropdown est ouvert */}
+      {!showResults && (
+        <>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            <span className="text-xs text-zinc-500 font-medium">Tendances :</span>
+            {["Serpent", "Voler", "Dents", "Eau", "Maison", "Mort"].map((term) => (
+              <a
+                key={term}
+                href={`/recherche?q=${encodeURIComponent(term.toLowerCase())}`}
+                className="rounded-full border border-indigo-200 bg-white/80 px-3 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-50 hover:border-indigo-400 transition-all"
+              >
+                {term}
+              </a>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-6">
+            <div className="flex items-center gap-2 text-sm text-zinc-500">
+              <BookOpen className="h-4 w-4 text-indigo-400" />
+              <span>Interprétations détaillées</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-zinc-500">
+              <Zap className="h-4 w-4 text-indigo-400" />
+              <span>Psychologique &amp; symbolique</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-zinc-500">
+              <RefreshCw className="h-4 w-4 text-indigo-400" />
+              <span>Mis à jour régulièrement</span>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Dropdown de résultats */}
       {showResults && (
